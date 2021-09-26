@@ -111,8 +111,12 @@ namespace Discord.Addons.Music.Common
         {
             return Process.Start(new ProcessStartInfo
             {
-                FileName = "cmd.exe",
-                Arguments = $"/C youtube-dl.exe --format bestaudio -o - {url} | ffmpeg.exe -loglevel panic -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1",
+                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                            ? "cmd.exe"
+                            : "/bin/bash",
+                Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                            ? $"/C youtube-dl.exe --format bestaudio -o - {url} | ffmpeg.exe -loglevel panic -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1"
+                            : $"-c \"youtube-dl --format bestaudio -o - {url} | ffmpeg -loglevel panic -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1\"",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
